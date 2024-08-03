@@ -6,6 +6,8 @@ import jakarta.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -25,6 +27,8 @@ public class GithubService {
     private String githubApiToken;
     private WebClient webClient;
 
+    private final Log log = LogFactory.getLog(GithubService.class);
+
     private static final String GITHUB_API_URL = "https://api.github.com";
 
     @PostConstruct
@@ -34,6 +38,9 @@ public class GithubService {
 
         if (!githubApiToken.isEmpty()) {
             webClientBuilder.defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + githubApiToken);
+            log.info("GitHub API token is set to: " + githubApiToken);
+        } else {
+            log.warn("GitHub API token is not set. Rate limits may be applied.");
         }
 
         this.webClient = webClientBuilder.build();
