@@ -40,17 +40,11 @@ To build and run the application using Docker:
 
 1. Build the jar file:
 
-```bash
-./gradlew build
-```
-
-2. Build the Docker image:
-
    ```bash
    docker build -t github-repo-lister .
    ```
 
-3. Run the Docker container:
+2. Build the Docker image:
 
    ```bash
    docker run -p 8080:8080 -e GITHUB_API_TOKEN=your_github_personal_access_token github-repo-lister
