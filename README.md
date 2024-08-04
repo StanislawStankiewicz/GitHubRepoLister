@@ -2,18 +2,31 @@
 
 ## Description
 
-GitHub Repo Lister is a Spring Boot application designed to interact with the GitHub API. It provides endpoints to list repositories and their branches for a given GitHub user. The application handles errors gracefully and provides custom error responses.
+GitHub Repo Lister is a Spring Boot application designed to interact with the GitHub API.
 
-## Setup
+## Quick start
 
-### Clone the repository
+### Docker
 
 ```bash
-git clone <repository-url>
-cd <repository-directory>
+docker run -p 8080:8080 stahuofficial/github-repo-lister
+```
+or
+
+```bash
+docker run -p 8080:8080 -e GITHUB_API_TOKEN=your_token_here stahuofficial/github-repo-lister
 ```
 
-### Configuration
+Note: The `GITHUB_API_TOKEN` environment variable is optional. If it is not provided, the rate is limited to 60 requests per hour.
+
+### Cloning the repository
+
+```bash
+git clone https://github.com/StanislawStankiewicz/GitHubRepoLister
+cd GitHubRepoLister
+```
+
+#### Configuration
 
 Update the `application.properties` file located in the `src/main/resources` directory with your GitHub personal access token:
 
@@ -21,7 +34,7 @@ Update the `application.properties` file located in the `src/main/resources` dir
 github.api.token=your_github_personal_access_token
 ```
 
-Alternatively, you can supply the GitHub token as an environment variable. If no token is provided, the rate is limited to 60 requests per hour.
+Alternatively, you can supply the GitHub token as an environment variable. If no token is provided, the rate will be limited to 60 requests per hour by the GitHub API.
 
 ### Build and Run the Application
 
@@ -33,30 +46,6 @@ To build and run the application using Gradle:
 ./gradlew build
 ./gradlew bootRun
 ```
-
-#### Using Docker
-
-To build and run the application using Docker:
-
-1. Build the jar file:
-
-   ```bash
-   ./gradlew build
-   ```
-
-2. Build the Docker image
-
-   ```bash
-   docker build -t github-repo-lister .
-   ```
-
-3. Run the Docker image:
-
-   ```bash
-   docker run -p 8080:8080 -e GITHUB_API_TOKEN=your_github_personal_access_token github-repo-lister
-   ```
-
-Note: The `GITHUB_API_TOKEN` environment variable is optional. If it is not provided, the rate is limited to 60 requests per hour.
 
 ## Usage
 
@@ -73,8 +62,23 @@ The application exposes the following endpoints:
   ```bash
   curl -X GET "http://localhost:8080/api/github/repos/StanislawStankiewicz"
   ```
+  
+  Response format:
+  ```
+  {
+      "name": "string",
+      "owner_login": "string",
+      "branches": 
+          [
+              {
+                  "name": "string",
+                  "last_commit_sha": "string"
+              }
+          ]
+  }
+  ```
 
-  Response (data stream):
+  Example response (data stream):
 
   ```
   data:{"name":"Blog-SpringBoot","owner_login":"StanislawStankiewicz","branches":[{"name":"main","last_commit_sha":"67536846f0997518c1294727ba4a5fdedc5b530c"}]}

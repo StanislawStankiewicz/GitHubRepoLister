@@ -1,5 +1,11 @@
+# Ignore everything in the build directory
+/build/*
+
+# Don't ignore the libs directory within build
+!/build/libs/
+
+# Other rules for ignoring files
 .gradle
-build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
