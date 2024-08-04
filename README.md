@@ -64,17 +64,16 @@ The application exposes the following endpoints:
   ```
   
   Response format:
-  ```
+  ```json
   {
-      "name": "string",
-      "owner_login": "string",
-      "branches": 
-          [
-              {
-                  "name": "string",
-                  "last_commit_sha": "string"
-              }
-          ]
+    "name": "string",
+    "owner_login": "string",
+    "branches": [
+      {
+        "name": "string",
+        "last_commit_sha": "string"
+      }
+    ]
   }
   ```
 
