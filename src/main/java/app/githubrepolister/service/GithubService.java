@@ -1,13 +1,10 @@
 package app.githubrepolister.service;
 
+import app.githubrepolister.dto.BranchInfo;
 import app.githubrepolister.dto.BranchResponse;
+import app.githubrepolister.dto.RepoInfo;
 import app.githubrepolister.dto.ReposResponse;
-import jakarta.annotation.PostConstruct;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -17,33 +14,26 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Flux;
 
-import java.util.List;
 
+@Log
 @Service
-@RequiredArgsConstructor
 public class GithubService {
 
-    @Value("${github.api.token:}")
-    private String githubApiToken;
-    private WebClient webClient;
-
-    private final Log log = LogFactory.getLog(GithubService.class);
-
+    private final WebClient webClient;
     private static final String GITHUB_API_URL = "https://api.github.com";
 
-    @PostConstruct
-    public void init() {
-        WebClient.Builder webClientBuilder = WebClient.builder()
-                .baseUrl(GITHUB_API_URL);
+    public GithubService(WebClient.Builder webClientBuilder,
+                         @Value("${github.api.token:}") String githubApiToken) {
+        WebClient.Builder builder = webClientBuilder.baseUrl(GITHUB_API_URL);
 
         if (!githubApiToken.isEmpty()) {
-            webClientBuilder.defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + githubApiToken);
+            builder.defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + githubApiToken);
             log.info("GitHub API token is set to: " + githubApiToken);
         } else {
-            log.warn("GitHub API token is not set. Rate limits may be applied.");
+            log.warning("GitHub API token is not set. Rate limits may be applied.");
         }
 
-        this.webClient = webClientBuilder.build();
+        this.webClient = builder.build();
     }
 
     public Flux<ReposResponse> getUserRepos(String ownerLogin) {
@@ -69,25 +59,11 @@ public class GithubService {
     public Flux<RepoInfo> getReposWithBranches(String ownerLogin) {
         return getUserRepos(ownerLogin)
                 .filter(repo -> !repo.isFork())
-                .flatMap(repo -> getRepoBranches(repo.getOwner().getLogin(), repo.getName())
-                        .map(branch -> new BranchInfo(branch.getName(), branch.getCommit().getSha()))
+                .flatMap(repo -> getRepoBranches(repo.owner().login(), repo.name())
+                        .map(branch -> new BranchInfo(branch.name(), branch.commit().sha()))
                         .collectList()
-                        .map(branchInfos -> new RepoInfo(repo.getName(), repo.getOwner().getLogin(), branchInfos))
+                        .map(branchInfos -> new RepoInfo(repo.name(), repo.owner().login(), branchInfos))
                 );
     }
 
-    @Data
-    @AllArgsConstructor
-    public static class RepoInfo {
-        private String name;
-        private String ownerLogin;
-        private List<BranchInfo> branches;
-    }
-
-    @Data
-    @AllArgsConstructor
-    public static class BranchInfo {
-        private String name;
-        private String lastCommitSha;
-    }
 }

@@ -1,7 +1,7 @@
 package app.githubrepolister.controller;
 
+import app.githubrepolister.dto.RepoInfo;
 import app.githubrepolister.service.GithubService;
-import app.githubrepolister.service.GithubService.RepoInfo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
